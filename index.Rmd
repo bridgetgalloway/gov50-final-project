@@ -12,3 +12,15 @@ output:
 ## Project thoughts
 
 I am interested in exploring data related to climate change. There are so many questions to still be answered regarding the impacts of climate change; I think some that might be especially interesting to look into would be the migration patterns of areas that are most at risk for climate related disasters, or potentially the instances of health related impacts of climate change, both negative and positive. Some research has showed that the rate of respiratory illness will go down as we shift towards cleaner energy, but there still might be other negative impacts on health from climate change. Another interesting question to answer will be the effect of more frequent and more intense heat waves on agriculture and/or life expectancy. 
+
+
+
+
+## Finding Data/Proposal
+
+
+```{r}
+
+```
+How will climate change impact respiratory illness? The WHO produced a report that states that working to reduce climate change will simultaneously lower the risk of respiratory illnesses (https://www.who.int/news-room/fact-sheets/detail/climate-change-and-health). In this analysis, I will examine the relationship between the amount of air pollutants and the number of deaths caused by respiratory illness. I hypothesize that areas with higher amounts of air pollution are more at risk for respiratory illness. I secured data from the EPA which includes the annual and seasonal concentration reports, along with the rate of deaths caused by respiratory illness by state. While there are some variables I cannot control for, I am looking to see if there is a relationship between higher amounts of pollution in a state, and higher death rates. Because this a naturalistic observational study, I cannot control for other variables like underlying health conditions, smoking, and other things, I cannot determine a causal relationship, but I hope to find a correlation between the two. 
+
