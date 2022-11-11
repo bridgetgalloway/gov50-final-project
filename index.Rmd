@@ -19,8 +19,53 @@ I am interested in exploring data related to climate change. There are so many q
 ## Finding Data/Proposal
 
 
+How will climate change impact respiratory illness? The WHO produced a report that states that working to reduce climate change will simultaneously lower the risk of respiratory illnesses (https://www.who.int/news-room/fact-sheets/detail/climate-change-and-health). In this analysis, I will examine the relationship between the amount of air pollutants and the number of deaths caused by respiratory illness. I hypothesize that areas with higher amounts of air pollution are more at risk for respiratory illness. I secured data from the EPA which includes the annual and seasonal concentration reports, along with the rate of deaths caused by respiratory illness by state. While there are some variables I cannot control for, I am looking to see if there is a relationship between higher amounts of pollution in a state, and higher death rates. Because this a naturalistic observational study, I cannot control for other variables like underlying health conditions, smoking, and other things, I cannot determine a causal relationship, but I hope to find a correlation between the two. 
+
+##Data Visualization
+
 ```{r}
+library(tidyverse)
+library(readr)
+aqi_2020 <- read_csv("annual_aqi_by_county_2020.csv")
+aqi_2019 <- read_csv("annual_aqi_by_county_2019.csv")
+aqi_2018 <- read_csv("annual_aqi_by_county_2018.csv")
+resp_death_2020 <- read_csv("respiratory_deaths_2020.csv")
+resp_death_2019 <- read_csv("respiratory_deaths_2019.csv")
+resp_death_2018 <- read_csv("respiratory_deaths_2018.csv")
+```
+
+```{r}
+##BASIC PLOTS
+aqi_state_mean2020 <- aqi_2020 |>
+  group_by(State) |>
+  summarize(state_mean = mean(`Good Days`)) 
+aqi_state_mean_plot2020 <- aqi_state_mean2020 |>
+  ggplot(aes(x = State, y = state_mean)) +
+  geom_point()
+aqi_state_mean2020
+aqi_state_mean_plot2020
+
+resp_death_plot2020 <- resp_death_2020 |>
+  ggplot(aes(x = STATE, y = DEATHS)) +
+  geom_point()
+resp_death_plot2020
+```
+
+```{r}
+##Joining the Data
+library(dplyr)
+respdeath2020_2 <- resp_death_2020 |>
+  select(YEAR, STATE, DEATHS) |> 
+  rename(Year = YEAR)
+aqi_state_mean2020<-aqi_state_mean2020 |>
+  mutate(State_abb = setNames(state.abb, state.name)[State])
+respdeath2020_2 |>
+  colnames()
+aqi_state_mean2020 |>
+  left_join(respdeath2020_2, by = c("State_abb" = "STATE"))
+
 
 ```
-How will climate change impact respiratory illness? The WHO produced a report that states that working to reduce climate change will simultaneously lower the risk of respiratory illnesses (https://www.who.int/news-room/fact-sheets/detail/climate-change-and-health). In this analysis, I will examine the relationship between the amount of air pollutants and the number of deaths caused by respiratory illness. I hypothesize that areas with higher amounts of air pollution are more at risk for respiratory illness. I secured data from the EPA which includes the annual and seasonal concentration reports, along with the rate of deaths caused by respiratory illness by state. While there are some variables I cannot control for, I am looking to see if there is a relationship between higher amounts of pollution in a state, and higher death rates. Because this a naturalistic observational study, I cannot control for other variables like underlying health conditions, smoking, and other things, I cannot determine a causal relationship, but I hope to find a correlation between the two. 
+
+
 
