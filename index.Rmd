@@ -67,5 +67,6 @@ aqi_state_mean2020 |>
 
 ```
 
-
+## My Data, And Some Visualizations
+I found data that I believe can successfully prove a correlation between the environment and respiratory health. From the EPA, I gathered a data set with the AQI scores of different states across the country, and I joined that data set with another that includes the number of repsiratory deaths per state from the last several years. If my hypothesis is correct, I expect to see states with worse AQI scores to experience higher rates of respiratory death. Here are my first visualizations of the data. 
 
