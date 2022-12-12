@@ -9,17 +9,10 @@ output:
 
 
 
-## Project thoughts
+## Introduction and Research Question
 
-I am interested in exploring data related to climate change. There are so many questions to still be answered regarding the impacts of climate change; I think some that might be especially interesting to look into would be the migration patterns of areas that are most at risk for climate related disasters, or potentially the instances of health related impacts of climate change, both negative and positive. Some research has showed that the rate of respiratory illness will go down as we shift towards cleaner energy, but there still might be other negative impacts on health from climate change. Another interesting question to answer will be the effect of more frequent and more intense heat waves on agriculture and/or life expectancy. 
-
-
-
-
-## Finding Data/Proposal
-
-
-How will climate change impact respiratory illness? The WHO produced a report that states that working to reduce climate change will simultaneously lower the risk of respiratory illnesses (https://www.who.int/news-room/fact-sheets/detail/climate-change-and-health). In this analysis, I will examine the relationship between the amount of air pollutants and the number of deaths caused by respiratory illness. I hypothesize that areas with higher amounts of air pollution are more at risk for respiratory illness. I secured data from the EPA which includes the annual and seasonal concentration reports, along with the rate of deaths caused by respiratory illness by state. While there are some variables I cannot control for, I am looking to see if there is a relationship between higher amounts of pollution in a state, and higher death rates. Because this a naturalistic observational study, I cannot control for other variables like underlying health conditions, smoking, and other things, I cannot determine a causal relationship, but I hope to find a correlation between the two. 
+  I am interested in exploring data related to climate change. There are so many questions to still be answered regarding the impacts of climate change; I think some that might be especially interesting to look into would be the migration patterns of areas that are most at risk for climate related disasters, or potentially the instances of health related impacts of climate change, both negative and positive. Some research has showed that the rate of respiratory illness will go down as we shift towards cleaner energy, but there still might be other negative impacts on health from climate change. 
+  The following project will look into how one's environment impacts respiratory illness. The WHO produced a report that states that working to reduce climate change will simultaneously lower the risk of respiratory illnesses (https://www.who.int/news-room/fact-sheets/detail/climate-change-and-health). In this analysis, I will examine the relationship between the amount of air pollutants and the number of deaths caused by respiratory illness. I hypothesize that areas with higher amounts of air pollution are more at risk for respiratory illness. I secured data from the EPA which includes the annual and seasonal concentration reports, along with the rate of deaths caused by respiratory illness by state. While there are some variables I cannot control for, I am looking to see if there is a relationship between higher amounts of pollution in a state, and higher death rates. Because this a naturalistic observational study, I cannot control for other variables like underlying health conditions, smoking, and other things, I cannot determine a causal relationship, but I hope to find a correlation between the two. 
 
 ##Data Visualization
 
@@ -30,8 +23,6 @@ aqi_2020 <- read_csv("annual_aqi_by_county_2020.csv")
 aqi_2019 <- read_csv("annual_aqi_by_county_2019.csv")
 aqi_2018 <- read_csv("annual_aqi_by_county_2018.csv")
 resp_death_2020 <- read_csv("respiratory_deaths_2020.csv")
-resp_death_2019 <- read_csv("respiratory_deaths_2019.csv")
-resp_death_2018 <- read_csv("respiratory_deaths_2018.csv")
 ```
 
 ```{r}
@@ -54,19 +45,61 @@ resp_death_plot2020
 ```{r}
 ##Joining the Data
 library(dplyr)
+aqi <- rbind(aqi_2020, aqi_2019, aqi_2018)
+aqi <- aqi |>
+  group_by(State, Year) |>
+  summarize(state_mean = mean(`Good Days`))
 respdeath2020_2 <- resp_death_2020 |>
   select(YEAR, STATE, DEATHS) |> 
   rename(Year = YEAR)
-aqi_state_mean2020<-aqi_state_mean2020 |>
+aqi <- aqi |>
   mutate(State_abb = setNames(state.abb, state.name)[State])
 respdeath2020_2 |>
   colnames()
-aqi_state_mean2020 |>
-  left_join(respdeath2020_2, by = c("State_abb" = "STATE"))
-
-
+dat <- aqi |>
+  left_join(respdeath2020_2, by = c("State_abb" = "STATE", "Year"))
 ```
 
 ## My Data, And Some Visualizations
-I found data that I believe can successfully prove a correlation between the environment and respiratory health. From the EPA, I gathered a data set with the AQI scores of different states across the country, and I joined that data set with another that includes the number of repsiratory deaths per state from the last several years. If my hypothesis is correct, I expect to see states with worse AQI scores to experience higher rates of respiratory death. Here are my first visualizations of the data. 
+  A section describing your data, including the type of research design (e.g. experimental, cross-sectional, longitudinal, etc.) and a plot that summarizes the dependent variable \
+I found data that I believe can successfully prove a correlation between the environment and respiratory health. From the EPA, I gathered a data set with the AQI scores of different states across the country, and I joined that data set with another that includes the number of respiratory deaths per state from the last several years. If my hypothesis is correct, I expect to see states with worse AQI scores to experience higher rates of respiratory death. Above are my first visualizations of the data. The easiest to one to digest, based on the makeup of my data, I believe, is the tibble which includes the joined data, as it highlights both the AQI and the death rate per state, which is harder to see on the graphs. 
+  My dependent variable is exhibited in the graph above, labeled as the resp_death_plot2020. This plot shows the respiratory death rate by state. In this research study, I am looking to show a correlation between how a state's AQI score might impact the respiratory death rate by state. In this plot, it is evident that the death rates of the states are highly varied. 
+##Regression
+I will now run a regression with state mean aqi as my first independent variable, and year as my second independent variable, with the number of deaths in a state per year as the outcome variable. 
+
+```{r}
+library(broom)
+reg1 <- lm(DEATHS ~ state_mean, data = dat)
+tidy(reg1, conf.int = TRUE, conf.level = 0.95)
+mult_reg1 <- lm(DEATHS ~ state_mean  + Year, data = dat)
+tidy(mult_reg1, conf.int = TRUE, conf.level = 0.95)
+mult_reg2 <- lm(DEATHS ~ state_mean  + factor(Year, levels = c(2018, 2019, 2020)), data = dat)
+tidy(mult_reg2, conf.int = TRUE, conf.level = 0.95)
+
+```
+
+```{r}
+library(modelsummary)
+var_labels <- c(
+  "(Intercept)" = "Intercept",
+  "state_mean" = "State AQI Mean",
+  "Year" = "Year",
+  "factor(Year, levels = c(2018, 2019, 2020))2019" = "Year 2018 v. 2020",
+  "factor(Year, levels = c(2018, 2019, 2020))2020" = "Year 2018 v. 2019"
+)
+modelsummary::modelsummary(list(mult_reg1, reg1, mult_reg2), 
+                           coef_map = var_labels,
+                           gof_map = c("nobs", "R2", "R2 adj."))
+
+```
+
+##Interpreting My Regressions
+The first regression that I ran, labeled as reg1, used state_mean as the independent variable to predict the outcome variable, DEATHS. In other words, I was trying to find if state aqi means have a significant impact on the number of respiratory deaths in a state. (Try to interpret "estimate" in words) I found, however, that this regression (the estimate of regression coefficient for state aqi) has a p value of 0.184, which is outside the statistically significant range (significance level) of 0.05. I therefore must reject the null hypothesis for this regression, meaning that state aqi does not have a statistically significant impact on state deaths. 
+
+The second regression that I ran, which was labeled as mult_reg1, used both state_mean as well as the years variable as explanatory variables, to again predict the outcome variable, DEATHS. In this regression, I was trying to control for time as (since this is) a potential confounding variable, to see if it had any difference in the outcome of the number of respiratory deaths (if we can still observe statistically significant relationship between our main independent and outcome variables in case we control for the time trend). I once again found that this regression (specify this more) has a p value outside of (greater than) 0.05, indicating that both state_mean and years do not have a statistically significant impact on the number of respiratory deaths in a state. This regression, had it been successful, would have been more likely to prove a true correlation (more robust statistical test) between the variables because it has a control for an additional variable, whereas my first regression did not. 
+
+The third and final regression that I ran, labeled mult_reg2, was similar to mult_reg1 in that it used state_mean and the years variable as explanatory variables in order to predict the outcome variable of DEATHS, but in this regression, I chose to utilize the factor function to make the years variable into a vector (factor variable), to show change (allow for differerent relationship) over time. I hoped that this would control for the potential variance between years in a state, to see if it may have a significant impact in the number of respiratory deaths in a state. Like the two regressions before this, this regression still had a p value outside of 0.05, which means that once again, the two explanatory variables do not have any statistical significance on the number of respiratory deaths. I cannot, therefore, reject the null hypothesis, meaning that I cannot accept the hypothesis that state AQI has any statistically significant effect on the number of respiratory deaths in that state. 
+
+
+
 
