@@ -111,3 +111,8 @@ modelsummary::modelsummary(list(mult_reg1, reg1, mult_reg2),
 ## Conclusions
 
   In conclusion, none of my three regressions were conclusive enough to reject the null hypothesis of the study; in other words, my regressions could not prove that there is a correlation between air quality, and more specifically the number of days in a year with a good AQI, and the number of respiratory related deaths per state. I think the limitations of this study were that it did not have a high enough internal validity, and therefore we could not determine causal effects of the number of days with good AQI. I think that in order to improve the study, I would like to study the AQI and death rate by county rather than state. I think that these smaller environment sizes would be more relevant and have a clearer impact because it would be more focused on the local effects of AQI on respiratory illness. Another reason that the study might lack validity is because the causes of respiratory illness are difficult to discern; in other words, they could be caused by family medical history, smoking, local environment, and other factors. In order to improve this, I would use a smaller amount of counties and try to evaluate the medical pre-existing conditions of the respiratory deaths in the county using death records. 
+  
+## Works Cited
+https://aqs.epa.gov/aqsweb/airdata/download_files.html#Annual 
+https://www.who.int/news-room/fact-sheets/detail/climate-change-and-health
+https://www.cdc.gov/nchs/pressroom/sosmap/lung_disease_mortality/lung_disease.htm
